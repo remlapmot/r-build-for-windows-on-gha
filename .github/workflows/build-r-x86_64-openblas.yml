@@ -31,8 +31,20 @@ jobs:
         run: |
           $url = "https://github.com/r-hub/rtools45/releases/download/latest/rtools45.exe"
           curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --fail -o rtools45.exe $url
-          Start-Process -Wait -FilePath ".\rtools45.exe" `
-            -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
+          $log = "$PWD\rtools45-install.log"
+          $proc = Start-Process -FilePath ".\rtools45.exe" `
+            -ArgumentList '/VERYSILENT','/SP-','/SUPPRESSMSGBOXES','/NORESTART',"/LOG=$log" `
+            -PassThru
+          $timeoutMs = 15 * 60 * 1000
+          if (-not $proc.WaitForExit($timeoutMs)) {
+            Write-Host "::error::Rtools45 installer did not exit within 15 minutes; killing."
+            if (Test-Path $log) { Write-Host "--- rtools45-install.log ---"; Get-Content $log }
+            $proc.Kill()
+            exit 1
+          }
+          Write-Host "Installer exit code: $($proc.ExitCode)"
+          if (Test-Path $log) { Write-Host "--- rtools45-install.log ---"; Get-Content $log }
+          if ($proc.ExitCode -ne 0) { exit $proc.ExitCode }
 
       - name: Refresh Msys2 package database
         shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
