@@ -5,8 +5,9 @@ on:
 
 env:
   R_VERSION: '4.6.0'
-  RTOOLS_VER: '6536'     # Rtools45 toolchain version
-  RTOOLS_SCRIPTS: '6492' # Rtools45 installer scripts version
+  RTOOLS_VER: '6768'      # Rtools45 toolchain version
+  RTOOLS_SCRIPTS: '6492'  # Rtools45 installer scripts version
+  TCLTK_SCRIPTS: '6663'   # Tcl/Tk bundle scripts version (differs from installer)
 
 jobs:
   build:
@@ -51,7 +52,7 @@ jobs:
         shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
         run: |
           cd /c/r-build
-          BUNDLE="tcltk-${RTOOLS_VER}-${RTOOLS_SCRIPTS}.zip"
+          BUNDLE="tcltk-${RTOOLS_VER}-${TCLTK_SCRIPTS}.zip"
           wget -q "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/${BUNDLE}"
           cd R-src
           unzip -q "../${BUNDLE}"

@@ -5,8 +5,9 @@ on:
 
 env:
   R_VERSION: '4.6.0'
-  RTOOLS_VER: '6536'     # Rtools45 toolchain version
-  RTOOLS_SCRIPTS: '6492' # Rtools45 installer scripts version
+  RTOOLS_VER: '6768'      # Rtools45 toolchain version
+  RTOOLS_SCRIPTS: '6492'  # Rtools45 installer scripts version
+  TCLTK_SCRIPTS: '6663'   # Tcl/Tk bundle scripts version (differs from installer)
 
 jobs:
   build:
@@ -26,12 +27,10 @@ jobs:
                       [System.Environment]::GetEnvironmentVariable("Path","User")
           miktex packages install inconsolata
 
-      # The x86_64 Rtools45 installer runs via emulation on ARM Windows and
-      # includes the aarch64-w64-mingw32.static.posix cross-compilation toolchain.
-      - name: Download and install Rtools45
+      - name: Download and install Rtools45 (aarch64)
         shell: powershell
         run: |
-          $file = "rtools45-$env:RTOOLS_VER-$env:RTOOLS_SCRIPTS.exe"
+          $file = "rtools45-aarch64-$env:RTOOLS_VER-$env:RTOOLS_SCRIPTS.exe"
           $url  = "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/$file"
           Invoke-WebRequest -Uri $url -OutFile $file -UseBasicParsing
           Start-Process -Wait -FilePath ".\$file" `
@@ -53,7 +52,7 @@ jobs:
         shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
         run: |
           cd /c/r-build
-          BUNDLE="tcltk-${RTOOLS_VER}-${RTOOLS_SCRIPTS}-aarch64.zip"
+          BUNDLE="tcltk-aarch64-${RTOOLS_VER}-${TCLTK_SCRIPTS}.zip"
           wget -q "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/${BUNDLE}"
           cd R-src
           unzip -q "../${BUNDLE}"
