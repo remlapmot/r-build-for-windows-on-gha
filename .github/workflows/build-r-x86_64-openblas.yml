@@ -90,3 +90,10 @@ jobs:
           name: R-${{ env.R_VERSION }}-x86_64-openblas
           path: R-${{ env.R_VERSION }}.exe
           if-no-files-found: error
+
+      - name: Smoke-test installed R
+        shell: powershell
+        run: |
+          Start-Process -Wait -FilePath ".\R-$env:R_VERSION.exe" `
+            -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
+          & "C:\Program Files\R\R-$env:R_VERSION\bin\Rscript.exe" -e "utils::sessionInfo()"

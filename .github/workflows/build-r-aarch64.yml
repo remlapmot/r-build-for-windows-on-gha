@@ -90,3 +90,10 @@ jobs:
           name: R-${{ env.R_VERSION }}-aarch64
           path: R-${{ env.R_VERSION }}-aarch64.exe
           if-no-files-found: error
+
+      - name: Smoke-test installed R
+        shell: powershell
+        run: |
+          Start-Process -Wait -FilePath ".\R-$env:R_VERSION-aarch64.exe" `
+            -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
+          & "C:\Program Files\R-aarch64\R-$env:R_VERSION\bin\Rscript.exe" -e "utils::sessionInfo()"
