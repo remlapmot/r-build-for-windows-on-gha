@@ -32,7 +32,7 @@ jobs:
         run: |
           $file = "rtools45-aarch64-$env:RTOOLS_VER-$env:RTOOLS_SCRIPTS.exe"
           $url  = "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/$file"
-          curl.exe -L --retry 5 --retry-delay 10 -o $file $url
+          curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --fail -o $file $url
           Start-Process -Wait -FilePath ".\$file" `
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
 
