@@ -1,0 +1,95 @@
+name: Build R 4.6.0 aarch64
+
+on:
+  workflow_dispatch:
+
+env:
+  R_VERSION: '4.6.0'
+  RTOOLS_VER: '6536'     # Rtools45 toolchain version
+  RTOOLS_SCRIPTS: '6492' # Rtools45 installer scripts version
+
+jobs:
+  build:
+    runs-on: windows-11-arm
+    timeout-minutes: 360
+
+    steps:
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install -y innosetup
+
+      - name: Install MiKTeX
+        shell: powershell
+        run: |
+          choco install -y miktex
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" +
+                      [System.Environment]::GetEnvironmentVariable("Path","User")
+          miktex packages install inconsolata
+
+      # The x86_64 Rtools45 installer runs via emulation on ARM Windows and
+      # includes the aarch64-w64-mingw32.static.posix cross-compilation toolchain.
+      - name: Download and install Rtools45
+        shell: powershell
+        run: |
+          $file = "rtools45-$env:RTOOLS_VER-$env:RTOOLS_SCRIPTS.exe"
+          $url  = "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/$file"
+          Invoke-WebRequest -Uri $url -OutFile $file -UseBasicParsing
+          Start-Process -Wait -FilePath ".\$file" `
+            -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
+
+      - name: Refresh Msys2 package database
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: pacman -Sy --noconfirm wget subversion
+
+      - name: Download R source tarball
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: |
+          mkdir -p /c/r-build && cd /c/r-build
+          wget -q "https://cran.r-project.org/src/base/R-${R_VERSION}.tar.gz"
+          tar xzf "R-${R_VERSION}.tar.gz"
+          mv "R-${R_VERSION}" R-src
+
+      - name: Download Tcl/Tk bundle (aarch64)
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: |
+          cd /c/r-build
+          BUNDLE="tcltk-${RTOOLS_VER}-${RTOOLS_SCRIPTS}-aarch64.zip"
+          wget -q "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/${BUNDLE}"
+          cd R-src
+          unzip -q "../${BUNDLE}"
+
+      - name: Write MkRules.local (aarch64)
+        shell: powershell
+        run: |
+          @"
+          ISDIR = C:/Program Files (x86)/Inno Setup 6
+          USE_LLVM = 1
+          WIN =
+          "@ | Set-Content C:\r-build\R-src\src\gnuwin32\MkRules.local
+
+      - name: Build R
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: |
+          export PATH="/aarch64-w64-mingw32.static.posix/bin:${PATH}"
+          export PATH="/c/Program Files/MiKTeX/miktex/bin/x64:${PATH}"
+          export TAR="/usr/bin/tar"
+          export TAR_OPTIONS="--force-local"
+          cd /c/r-build/R-src/src/gnuwin32
+          make rsync-recommended
+          make all recommended
+          make distribution
+
+      - name: Stage installer
+        shell: powershell
+        run: |
+          $src = Get-ChildItem C:\r-build\R-src\src\gnuwin32\installer -Filter "R-*.exe" |
+                 Select-Object -First 1
+          Write-Host "Found installer: $($src.FullName)"
+          Copy-Item $src.FullName "R-$env:R_VERSION-aarch64.exe"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: R-${{ env.R_VERSION }}-aarch64
+          path: R-${{ env.R_VERSION }}-aarch64.exe
+          if-no-files-found: error
