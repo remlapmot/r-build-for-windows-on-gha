@@ -6,7 +6,6 @@ on:
 env:
   R_VERSION: '4.6.0'
   RTOOLS_VER: '6768'      # Rtools45 toolchain version
-  RTOOLS_SCRIPTS: '6492'  # Rtools45 installer scripts version
   TCLTK_SCRIPTS: '6663'   # Tcl/Tk bundle scripts version (differs from installer)
 
 jobs:
@@ -30,10 +29,9 @@ jobs:
       - name: Download and install Rtools45
         shell: powershell
         run: |
-          $file = "rtools45-$env:RTOOLS_VER-$env:RTOOLS_SCRIPTS.exe"
-          $url  = "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/$file"
-          curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --fail -o $file $url
-          Start-Process -Wait -FilePath ".\$file" `
+          $url = "https://github.com/r-hub/rtools45/releases/download/latest/rtools45.exe"
+          curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --fail -o rtools45.exe $url
+          Start-Process -Wait -FilePath ".\rtools45.exe" `
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
 
       - name: Refresh Msys2 package database
