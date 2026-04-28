@@ -1,4 +1,4 @@
-name: Build R 4.6.0 x86_64 (OpenBLAS)
+name: Build R for Windows x86_64 (OpenBLAS)
 
 on:
   workflow_dispatch:

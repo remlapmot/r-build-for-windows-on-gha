@@ -1,4 +1,4 @@
-name: Build R 4.6.0 aarch64
+name: Build R for Windows aarch64
 
 on:
   workflow_dispatch:
