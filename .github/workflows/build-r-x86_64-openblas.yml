@@ -135,7 +135,7 @@ jobs:
           LAPACK_LIBS = -lopenblas
           "@ | Set-Content C:\r-build\R-src\src\gnuwin32\MkRules.local
 
-      - name: Build R
+      - name: Build R (compile + recommended)
         shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
         run: |
           export PATH="/x86_64-w64-mingw32.static.posix/bin:${PATH}"
@@ -145,7 +145,50 @@ jobs:
           cd /c/r-build/R-src/src/gnuwin32
           make rsync-recommended
           make all recommended
+
+      - name: Swap Rblas.dll and Rlapack.dll for OpenBLAS-linked builds
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: |
+          export PATH="/x86_64-w64-mingw32.static.posix/bin:${PATH}"
+          cd /c/r-build/R-src
+
+          echo "--- locating .def files ---"
+          BLAS_DEF=$(find src -name 'Rblas.def' | head -n1)
+          LAPACK_DEF=$(find src -name 'Rlapack.def' | head -n1)
+          echo "BLAS_DEF=$BLAS_DEF"
+          echo "LAPACK_DEF=$LAPACK_DEF"
+          if [ -z "$BLAS_DEF" ] || [ -z "$LAPACK_DEF" ]; then
+            echo "::error::Could not locate Rblas.def and/or Rlapack.def"
+            exit 1
+          fi
+
+          echo "--- locating libopenblas.a ---"
+          find / -name 'libopenblas*' 2>/dev/null | head -n20 || true
+
+          echo "--- pre-swap sizes ---"
+          ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
+
+          gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            -lgfortran -lquadmath -lm -lpthread
+          gcc -shared -o bin/x64/Rlapack.dll "$LAPACK_DEF" \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            -lgfortran -lquadmath -lm -lpthread
+
+          echo "--- post-swap sizes ---"
+          ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
+
+      - name: Build distribution (installer)
+        shell: C:\rtools45\usr\bin\bash.exe --login -eo pipefail {0}
+        run: |
+          export PATH="/x86_64-w64-mingw32.static.posix/bin:${PATH}"
+          export PATH="/c/Program Files/MiKTeX/miktex/bin/x64:${PATH}"
+          export TAR="/usr/bin/tar"
+          export TAR_OPTIONS="--force-local"
+          cd /c/r-build/R-src/src/gnuwin32
           make distribution
+          echo "--- post-distribution sizes (should still be OpenBLAS-sized) ---"
+          ls -la /c/r-build/R-src/bin/x64/Rblas.dll /c/r-build/R-src/bin/x64/Rlapack.dll
 
       - name: Stage installer
         shell: powershell
