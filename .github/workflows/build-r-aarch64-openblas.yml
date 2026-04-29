@@ -110,7 +110,7 @@ jobs:
           fi
 
           echo "--- locating libopenblas.a ---"
-          find / -name 'libopenblas*' 2>/dev/null | head -n20 || true
+          find /aarch64-w64-mingw32.static.posix -name 'libopenblas*' 2>/dev/null || true
 
           echo "--- pre-swap sizes ---"
           ls -la bin/Rblas.dll bin/Rlapack.dll
