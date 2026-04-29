@@ -47,7 +47,14 @@ jobs:
       - name: Install MiKTeX
         shell: powershell
         run: |
-          choco install -y miktex
+          $ok = $false
+          for ($i = 1; $i -le 3; $i++) {
+            choco install -y miktex
+            if ($LASTEXITCODE -eq 0) { $ok = $true; break }
+            Write-Host "MiKTeX install attempt $i failed; retrying in 30 s..."
+            Start-Sleep 30
+          }
+          if (-not $ok) { Write-Host "::error::MiKTeX install failed after 3 attempts"; exit 1 }
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" +
                       [System.Environment]::GetEnvironmentVariable("Path","User")
           initexmf --admin --set-config-value=[MPM]AutoInstall=1
