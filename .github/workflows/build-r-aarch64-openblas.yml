@@ -124,10 +124,15 @@ jobs:
           fi
           echo "Using FORTRAN_LIBS=${FORTRAN_LIBS:-'(none)'}"
 
-          gcc -shared -o bin/Rblas.dll "$BLAS_DEF" \
-            -lopenblas $FORTRAN_LIBS -lm -lpthread
-          gcc -shared -o bin/Rlapack.dll "$LAPACK_DEF" \
-            -lopenblas $FORTRAN_LIBS -lm -lpthread
+          sed '/_QQcl/d' "$BLAS_DEF"   > blas_clean.def
+          sed '/_QQcl/d' "$LAPACK_DEF" > lapack_clean.def
+
+          gcc -shared -o bin/Rblas.dll blas_clean.def \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            $FORTRAN_LIBS -lm -lpthread
+          gcc -shared -o bin/Rlapack.dll lapack_clean.def \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            $FORTRAN_LIBS -lm -lpthread
 
           echo "--- post-swap sizes ---"
           ls -la bin/Rblas.dll bin/Rlapack.dll
