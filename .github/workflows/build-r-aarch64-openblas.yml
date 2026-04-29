@@ -195,7 +195,7 @@ jobs:
           $sizeMB = [math]::Round((Get-Item $blas).Length / 1MB, 2)
           Write-Host "Rblas.dll size: $sizeMB MB"
           if ($sizeMB -lt 1) {
-            Write-Host "::error::Rblas.dll is too small ($sizeMB MB) — OpenBLAS link did not take effect"
+            Write-Host "::error::Rblas.dll is too small ($sizeMB MB) - OpenBLAS link did not take effect"
             exit 1
           }
           $ascii = [System.Text.Encoding]::ASCII.GetString(
