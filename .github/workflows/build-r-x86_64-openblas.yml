@@ -168,6 +168,25 @@ jobs:
           echo "--- pre-swap sizes ---"
           ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
 
+          echo "--- building symbol list from libopenblas.a ---"
+          OPENBLAS_LIB=/x86_64-w64-mingw32.static.posix/lib/libopenblas.a
+          nm --defined-only "$OPENBLAS_LIB" 2>/dev/null \
+            | awk '$2~/^[TtDd]$/{s=$3; gsub(/^_+/,"",s); print s}' \
+            | sort -u > openblas_syms.txt
+          echo "$(wc -l < openblas_syms.txt) defined symbols found"
+
+          filter_def() {
+            awk '
+              NR==FNR { syms[$0]=1; next }
+              /^[[:space:]]*(EXPORTS|LIBRARY)|^[[:space:]]*$/ { print; next }
+              /_QQcl/ { next }
+              { sym=$1; sub(/=.*/,"",sym); gsub(/[[:space:]]/,"",sym)
+                if (sym in syms) print }
+            ' openblas_syms.txt "$1" > "$2"
+          }
+          filter_def "$BLAS_DEF"   blas_clean.def
+          filter_def "$LAPACK_DEF" lapack_clean.def
+
           # libgomp's oacc-profiling.o references POSIX dlopen/dlsym/dlclose/dlerror
           # which don't exist on Windows; provide minimal Windows-compatible stubs.
           echo '#include <windows.h>'                                                              > dl_stubs.c
@@ -177,10 +196,10 @@ jobs:
           echo 'const char *dlerror(void) { return NULL; }'                                      >> dl_stubs.c
           gcc -c dl_stubs.c -o dl_stubs.o
 
-          gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" dl_stubs.o \
+          gcc -shared -o bin/x64/Rblas.dll blas_clean.def dl_stubs.o \
             -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
             -lgfortran -lquadmath -lgomp -lm -lpthread
-          gcc -shared -o bin/x64/Rlapack.dll "$LAPACK_DEF" dl_stubs.o \
+          gcc -shared -o bin/x64/Rlapack.dll lapack_clean.def dl_stubs.o \
             -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
             -lgfortran -lquadmath -lgomp -lm -lpthread
 
