@@ -169,11 +169,9 @@ jobs:
           ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
 
           gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" \
-            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            -lgfortran -lquadmath -lgomp -lm -lpthread
+            -lopenblas -lgfortran -lquadmath -lgomp -lm -lpthread
           gcc -shared -o bin/x64/Rlapack.dll "$LAPACK_DEF" \
-            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            -lgfortran -lquadmath -lgomp -lm -lpthread
+            -lopenblas -lgfortran -lquadmath -lgomp -lm -lpthread
 
           echo "--- post-swap sizes ---"
           ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
