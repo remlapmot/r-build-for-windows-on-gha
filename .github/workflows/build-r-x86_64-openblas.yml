@@ -168,10 +168,23 @@ jobs:
           echo "--- pre-swap sizes ---"
           ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
 
-          gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" \
-            -lopenblas -lgfortran -lquadmath -lgomp -lm -lpthread
-          gcc -shared -o bin/x64/Rlapack.dll "$LAPACK_DEF" \
-            -lopenblas -lgfortran -lquadmath -lgomp -lm -lpthread
+          # libgomp's oacc-profiling.o references POSIX dlopen/dlsym/dlclose/dlerror
+          # which don't exist on Windows; provide minimal Windows-compatible stubs.
+          cat > dl_stubs.c << 'EOF'
+#include <windows.h>
+void *dlopen(const char *f, int m) { return (void *)LoadLibraryA(f); }
+void *dlsym(void *h, const char *s) { return (void *)GetProcAddress((HMODULE)h, s); }
+int   dlclose(void *h)              { return FreeLibrary((HMODULE)h) ? 0 : -1; }
+const char *dlerror(void)           { return NULL; }
+EOF
+          gcc -c dl_stubs.c -o dl_stubs.o
+
+          gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" dl_stubs.o \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            -lgfortran -lquadmath -lgomp -lm -lpthread
+          gcc -shared -o bin/x64/Rlapack.dll "$LAPACK_DEF" dl_stubs.o \
+            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
+            -lgfortran -lquadmath -lgomp -lm -lpthread
 
           echo "--- post-swap sizes ---"
           ls -la bin/x64/Rblas.dll bin/x64/Rlapack.dll
