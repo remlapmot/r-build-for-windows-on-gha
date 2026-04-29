@@ -115,12 +115,21 @@ jobs:
           echo "--- pre-swap sizes ---"
           ls -la bin/Rblas.dll bin/Rlapack.dll
 
+          echo "--- discovering Fortran runtime libs ---"
+          FORTRAN_LIBS=""
+          if ls /aarch64-w64-mingw32.static.posix/lib/libgfortran* 2>/dev/null | head -1; then
+            FORTRAN_LIBS="-lgfortran -lquadmath"
+          elif ls /aarch64-w64-mingw32.static.posix/lib/libFortranRuntime* 2>/dev/null | head -1; then
+            FORTRAN_LIBS="-lFortranRuntime -lFortranDecimal"
+          fi
+          echo "Using FORTRAN_LIBS=${FORTRAN_LIBS:-'(none)'}"
+
           gcc -shared -o bin/Rblas.dll "$BLAS_DEF" \
             -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            -lgfortran -lquadmath -lm -lpthread
+            $FORTRAN_LIBS -lm -lpthread
           gcc -shared -o bin/Rlapack.dll "$LAPACK_DEF" \
             -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            -lgfortran -lquadmath -lm -lpthread
+            $FORTRAN_LIBS -lm -lpthread
 
           echo "--- post-swap sizes ---"
           ls -la bin/Rblas.dll bin/Rlapack.dll
