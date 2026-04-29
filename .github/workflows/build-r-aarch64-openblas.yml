@@ -124,8 +124,24 @@ jobs:
           fi
           echo "Using FORTRAN_LIBS=${FORTRAN_LIBS:-'(none)'}"
 
-          sed '/_QQcl/d' "$BLAS_DEF"   > blas_clean.def
-          sed '/_QQcl/d' "$LAPACK_DEF" > lapack_clean.def
+          echo "--- building symbol list from libopenblas.a ---"
+          OPENBLAS_LIB=/aarch64-w64-mingw32.static.posix/lib/libopenblas.a
+          nm --defined-only "$OPENBLAS_LIB" 2>/dev/null \
+            | awk '$2~/^[TtDd]$/{s=$3; gsub(/^_+/,"",s); print s}' \
+            | sort -u > openblas_syms.txt
+          echo "$(wc -l < openblas_syms.txt) defined symbols found"
+
+          filter_def() {
+            awk '
+              NR==FNR { syms[$0]=1; next }
+              /^[[:space:]]*(EXPORTS|LIBRARY)|^[[:space:]]*$/ { print; next }
+              /_QQcl/ { next }
+              { sym=$1; sub(/=.*/,"",sym); gsub(/[[:space:]]/,"",sym)
+                if (sym in syms) print }
+            ' openblas_syms.txt "$1" > "$2"
+          }
+          filter_def "$BLAS_DEF"   blas_clean.def
+          filter_def "$LAPACK_DEF" lapack_clean.def
 
           gcc -shared -o bin/Rblas.dll blas_clean.def \
             -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
