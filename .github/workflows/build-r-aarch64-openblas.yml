@@ -125,11 +125,9 @@ jobs:
           echo "Using FORTRAN_LIBS=${FORTRAN_LIBS:-'(none)'}"
 
           gcc -shared -o bin/Rblas.dll "$BLAS_DEF" \
-            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            $FORTRAN_LIBS -lm -lpthread
+            -lopenblas $FORTRAN_LIBS -lm -lpthread
           gcc -shared -o bin/Rlapack.dll "$LAPACK_DEF" \
-            -Wl,--whole-archive -lopenblas -Wl,--no-whole-archive \
-            $FORTRAN_LIBS -lm -lpthread
+            -lopenblas $FORTRAN_LIBS -lm -lpthread
 
           echo "--- post-swap sizes ---"
           ls -la bin/Rblas.dll bin/Rlapack.dll
