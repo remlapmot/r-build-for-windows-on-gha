@@ -170,13 +170,11 @@ jobs:
 
           # libgomp's oacc-profiling.o references POSIX dlopen/dlsym/dlclose/dlerror
           # which don't exist on Windows; provide minimal Windows-compatible stubs.
-          cat > dl_stubs.c << 'EOF'
-#include <windows.h>
-void *dlopen(const char *f, int m) { return (void *)LoadLibraryA(f); }
-void *dlsym(void *h, const char *s) { return (void *)GetProcAddress((HMODULE)h, s); }
-int   dlclose(void *h)              { return FreeLibrary((HMODULE)h) ? 0 : -1; }
-const char *dlerror(void)           { return NULL; }
-EOF
+          echo '#include <windows.h>'                                                              > dl_stubs.c
+          echo 'void *dlopen(const char *f, int m) { return (void *)LoadLibraryA(f); }'          >> dl_stubs.c
+          echo 'void *dlsym(void *h, const char *s) { return (void *)GetProcAddress((HMODULE)h, s); }' >> dl_stubs.c
+          echo 'int   dlclose(void *h) { return FreeLibrary((HMODULE)h) ? 0 : -1; }'            >> dl_stubs.c
+          echo 'const char *dlerror(void) { return NULL; }'                                      >> dl_stubs.c
           gcc -c dl_stubs.c -o dl_stubs.o
 
           gcc -shared -o bin/x64/Rblas.dll "$BLAS_DEF" dl_stubs.o \
