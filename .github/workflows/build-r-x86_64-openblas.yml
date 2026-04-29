@@ -53,6 +53,37 @@ jobs:
       - name: Download and install Rtools45
         shell: powershell
         run: |
+          $want = $env:RTOOLS_VER
+          $entries = @(
+            Get-ItemProperty `
+              HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, `
+              HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* `
+              -ErrorAction SilentlyContinue |
+              Where-Object { $_.DisplayName -match 'Rtools' -and $_.DisplayName -match '45' }
+          )
+          foreach ($e in $entries) {
+            Write-Host "Found installed: $($e.DisplayName) version $($e.DisplayVersion)"
+          }
+          $matched = $entries | Where-Object { "$($_.DisplayVersion)" -match $want } | Select-Object -First 1
+          if ($matched) {
+            Write-Host "Rtools45 build $want already installed; skipping install."
+            exit 0
+          }
+          foreach ($e in $entries) {
+            $exe = $null
+            if ($e.UninstallString -match '^"?([^"]+\.exe)"?') {
+              $exe = $Matches[1]
+            }
+            if ($exe -and (Test-Path $exe)) {
+              Write-Host "Uninstalling $($e.DisplayName) via $exe"
+              Start-Process -Wait -FilePath $exe `
+                -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART'
+            }
+          }
+          if (Test-Path C:\rtools45) {
+            Write-Host "Removing leftover C:\rtools45"
+            Remove-Item -Recurse -Force C:\rtools45 -ErrorAction SilentlyContinue
+          }
           $url = "https://github.com/r-hub/rtools45/releases/download/latest/rtools45.exe"
           curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --fail -o rtools45.exe $url
           $log = "$PWD\rtools45-install.log"
