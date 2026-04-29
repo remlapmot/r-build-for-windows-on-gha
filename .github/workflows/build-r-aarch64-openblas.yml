@@ -103,7 +103,7 @@ jobs:
           Copy-Item $src.FullName "R-$env:R_VERSION-aarch64-openblas.exe"
 
       - name: Upload installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: R-${{ env.R_VERSION }}-aarch64-openblas
           path: R-${{ env.R_VERSION }}-aarch64-openblas.exe
