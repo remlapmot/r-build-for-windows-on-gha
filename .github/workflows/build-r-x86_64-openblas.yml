@@ -174,9 +174,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: powershell
         run: |
+          $ErrorActionPreference = 'Continue'
           $tag = "R-$env:R_VERSION"
           $file = "R-$env:R_VERSION-openblas.exe"
-          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
             gh release create $tag --repo $env:GITHUB_REPOSITORY `
               --title $tag --notes "R $env:R_VERSION Windows builds"
