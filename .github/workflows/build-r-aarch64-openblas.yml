@@ -118,9 +118,9 @@ jobs:
           echo "--- discovering Fortran runtime libs ---"
           FORTRAN_LIBS=""
           if ls /aarch64-w64-mingw32.static.posix/lib/libgfortran* 2>/dev/null | head -1; then
-            FORTRAN_LIBS="-lgfortran -lquadmath"
+            FORTRAN_LIBS="-lgfortran -lquadmath -lgomp"
           elif ls /aarch64-w64-mingw32.static.posix/lib/libFortranRuntime* 2>/dev/null | head -1; then
-            FORTRAN_LIBS="-lFortranRuntime -lFortranDecimal"
+            FORTRAN_LIBS="-lFortranRuntime -lFortranDecimal -lomp"
           fi
           echo "Using FORTRAN_LIBS=${FORTRAN_LIBS:-'(none)'}"
 
