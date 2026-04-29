@@ -169,6 +169,26 @@ jobs:
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
           & "C:\Program Files\R\R-$env:R_VERSION\bin\Rscript.exe" -e "utils::sessionInfo()"
 
+          $blas = "C:\Program Files\R\R-$env:R_VERSION\bin\x64\Rblas.dll"
+          if (-not (Test-Path $blas)) {
+            Write-Host "::error::Rblas.dll not found at $blas"
+            exit 1
+          }
+          $sizeMB = [math]::Round((Get-Item $blas).Length / 1MB, 2)
+          Write-Host "Rblas.dll size: $sizeMB MB"
+          if ($sizeMB -lt 1) {
+            Write-Host "::error::Rblas.dll is too small ($sizeMB MB) — OpenBLAS link did not take effect"
+            exit 1
+          }
+          $ascii = [System.Text.Encoding]::ASCII.GetString(
+                     [System.IO.File]::ReadAllBytes($blas))
+          $m = [regex]::Match($ascii, 'OpenBLAS[^\x00]{0,200}')
+          if ($m.Success) {
+            Write-Host "[OK] OpenBLAS signature in Rblas.dll: $($m.Value)"
+          } else {
+            Write-Host "::warning::OpenBLAS string not found in Rblas.dll (size check passed)"
+          }
+
       - name: Publish to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
