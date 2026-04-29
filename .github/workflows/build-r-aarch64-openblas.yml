@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: windows-11-arm
     timeout-minutes: 360
+    permissions:
+      contents: write
 
     steps:
       - name: Install Inno Setup
@@ -111,3 +113,21 @@ jobs:
           Start-Process -Wait -FilePath ".\R-$env:R_VERSION-aarch64-openblas.exe" `
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
           & "C:\Program Files\R-aarch64\R-$env:R_VERSION\bin\Rscript.exe" -e "utils::sessionInfo()"
+
+      - name: Publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          $tag = "R-$env:R_VERSION"
+          $file = "R-$env:R_VERSION-aarch64-openblas.exe"
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --repo $env:GITHUB_REPOSITORY `
+              --title $tag --notes "R $env:R_VERSION Windows builds"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "gh release create failed (likely a concurrent run created it); continuing"
+              $LASTEXITCODE = 0
+            }
+          }
+          gh release upload $tag $file --repo $env:GITHUB_REPOSITORY --clobber

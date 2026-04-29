@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: windows-latest
     timeout-minutes: 360
+    permissions:
+      contents: write
 
     steps:
       - name: Uninstall pre-installed R
@@ -149,18 +151,36 @@ jobs:
           $src = Get-ChildItem C:\r-build\R-src\src\gnuwin32\installer -Filter "R-*.exe" |
                  Select-Object -First 1
           Write-Host "Found installer: $($src.FullName)"
-          Copy-Item $src.FullName "R-$env:R_VERSION.exe"
+          Copy-Item $src.FullName "R-$env:R_VERSION-openblas.exe"
 
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: R-${{ env.R_VERSION }}-x86_64-openblas
-          path: R-${{ env.R_VERSION }}.exe
+          path: R-${{ env.R_VERSION }}-openblas.exe
           if-no-files-found: error
 
       - name: Smoke-test installed R
         shell: powershell
         run: |
-          Start-Process -Wait -FilePath ".\R-$env:R_VERSION.exe" `
+          Start-Process -Wait -FilePath ".\R-$env:R_VERSION-openblas.exe" `
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART'
           & "C:\Program Files\R\R-$env:R_VERSION\bin\Rscript.exe" -e "utils::sessionInfo()"
+
+      - name: Publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          $tag = "R-$env:R_VERSION"
+          $file = "R-$env:R_VERSION-openblas.exe"
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --repo $env:GITHUB_REPOSITORY `
+              --title $tag --notes "R $env:R_VERSION Windows builds"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "gh release create failed (likely a concurrent run created it); continuing"
+              $LASTEXITCODE = 0
+            }
+          }
+          gh release upload $tag $file --repo $env:GITHUB_REPOSITORY --clobber
