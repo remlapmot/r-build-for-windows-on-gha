@@ -3,7 +3,7 @@ R version:         R version 4.6.0 (2026-04-24 ucrt)
 Platform:          x86_64-w64-mingw32 
 BLAS:               
 LAPACK:             
-LAPACK version:    3.12.1 
+LAPACK version:    3.12.0 
 Logical CPUs:      24 
 Physical cores:    12 
 OPENBLAS_NUM_THREADS:  24
@@ -14,15 +14,15 @@ R_HOME:                C:/PROGRA~1/R/R-46~1.0-O
 R_ARCH:                /x64
 
 ==== Building test matrices ====
-Setup time: 9.94s
+Setup time: 1.35s
 
 ==== Benchmarks ====
-DGEMM   3000 x 3000               best=  9.230s  median=  9.280s  (n=3)
-crossprod 3000                    best=  8.570s  median=  8.590s  (n=3)
-Cholesky 3000                     best=  2.710s  median=  2.720s  (n=3)
-solve(S, b) 3000                  best=  2.500s  median=  2.520s  (n=3)
-solve(S)    3000                  best= 11.380s  median= 11.390s  (n=3)
-SVD      1500                     best=  5.020s  median=  5.050s  (n=3)
-sym eigen 1500                    best=  2.280s  median=  2.350s  (n=3)
+DGEMM   3000 x 3000               best=  0.140s  median=  0.140s  (n=3)
+crossprod 3000                    best=  0.090s  median=  0.090s  (n=3)
+Cholesky 3000                     best=  0.050s  median=  0.050s  (n=3)
+solve(S, b) 3000                  best=  0.320s  median=  0.320s  (n=3)
+solve(S)    3000                  best=  0.270s  median=  0.280s  (n=3)
+SVD      1500                     best=  0.590s  median=  0.610s  (n=3)
+sym eigen 1500                    best=  0.450s  median=  0.450s  (n=3)
 
 Done.
