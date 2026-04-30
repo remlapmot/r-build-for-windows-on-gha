@@ -3,14 +3,16 @@
 
 cat("==== BLAS / LAPACK configuration ====\n")
 si <- sessionInfo()
+ext <- extSoftVersion()
+get_ext <- function(k) if (k %in% names(ext)) ext[[k]] else ""
 cat("R version:        ", R.version.string, "\n")
 cat("Platform:         ", R.version$platform, "\n")
 cat("BLAS:             ",
     if (!is.null(si$BLAS) && nzchar(si$BLAS)) si$BLAS
-    else extSoftVersion()[["BLAS"]], "\n")
+    else get_ext("BLAS"), "\n")
 cat("LAPACK:           ",
     if (!is.null(si$LAPACK) && nzchar(si$LAPACK)) si$LAPACK
-    else extSoftVersion()[["LAPACK"]], "\n")
+    else get_ext("LAPACK"), "\n")
 cat("LAPACK version:   ", La_version(), "\n")
 cat("Logical CPUs:     ", parallel::detectCores(logical = TRUE), "\n")
 cat("Physical cores:   ", parallel::detectCores(logical = FALSE), "\n")
