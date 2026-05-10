@@ -1,0 +1,28 @@
+==== BLAS / LAPACK configuration ====
+R version:         R version 4.6.0 (2026-04-24) 
+Platform:          aarch64-apple-darwin23 
+BLAS:              /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK:            /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib 
+LAPACK version:    3.12.1 
+Logical CPUs:      10 
+Physical cores:    10 
+OPENBLAS_NUM_THREADS:  <unset>
+OMP_NUM_THREADS:       <unset>
+MKL_NUM_THREADS:       <unset>
+BLIS_NUM_THREADS:      <unset>
+R_HOME:                /Library/Frameworks/R.framework/Resources
+R_ARCH:                
+
+==== Building test matrices ====
+Setup time: 0.61s
+
+==== Benchmarks ====
+DGEMM   3000 x 3000               best=  0.117s  median=  0.117s  (n=3)
+crossprod 3000                    best=  0.060s  median=  0.060s  (n=3)
+Cholesky 3000                     best=  0.037s  median=  0.038s  (n=3)
+solve(S, b) 3000                  best=  0.147s  median=  0.148s  (n=3)
+solve(S)    3000                  best=  0.293s  median=  0.293s  (n=3)
+SVD      1500                     best=  0.259s  median=  0.263s  (n=3)
+sym eigen 1500                    best=  0.286s  median=  0.289s  (n=3)
+
+Done.
