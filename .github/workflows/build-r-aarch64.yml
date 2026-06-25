@@ -1,6 +1,8 @@
 name: Build R for Windows aarch64
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:

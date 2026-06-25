@@ -1,6 +1,8 @@
 name: 'Build R for Windows x86_64 (OpenBLAS)'
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
