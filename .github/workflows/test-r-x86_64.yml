@@ -42,16 +42,16 @@ jobs:
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART', '/DIR=C:\R-openblas'
 
       - name: Benchmark CRAN R
-        shell: powershell
+        shell: bash
         run: |
-          & "C:\R-cran\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-x86_64-cran.log -Encoding utf8
+          "C:/R-cran/bin/Rscript.exe" tests/blas-benchmark.R 2>&1 |
+            tee tests/results-x86_64-cran.log
 
       - name: Benchmark OpenBLAS R
-        shell: powershell
+        shell: bash
         run: |
-          & "C:\R-openblas\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-x86_64-openblas.log -Encoding utf8
+          "C:/R-openblas/bin/Rscript.exe" tests/blas-benchmark.R 2>&1 |
+            tee tests/results-x86_64-openblas.log
 
       - name: Commit results
         shell: bash

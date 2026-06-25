@@ -42,16 +42,16 @@ jobs:
             -ArgumentList '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART', '/DIR=C:\R-aarch64-openblas'
 
       - name: Benchmark aarch64 R
-        shell: powershell
+        shell: bash
         run: |
-          & "C:\R-aarch64\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-aarch64.log -Encoding utf8
+          "C:/R-aarch64/bin/Rscript.exe" tests/blas-benchmark.R 2>&1 |
+            tee tests/results-aarch64.log
 
       - name: Benchmark aarch64 OpenBLAS R
-        shell: powershell
+        shell: bash
         run: |
-          & "C:\R-aarch64-openblas\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-aarch64-openblas.log -Encoding utf8
+          "C:/R-aarch64-openblas/bin/Rscript.exe" tests/blas-benchmark.R 2>&1 |
+            tee tests/results-aarch64-openblas.log
 
       - name: Commit results
         shell: bash
