@@ -14,15 +14,15 @@ R_HOME:                C:/R-aarch64-openblas
 R_ARCH:                <unset>
 
 ==== Building test matrices ====
-Setup time: 1.69s
+Setup time: 1.67s
 
 ==== Benchmarks ====
-DGEMM   3000 x 3000               best=  0.970s  median=  1.030s  (n=3)
-crossprod 3000                    best=  0.500s  median=  0.520s  (n=3)
-Cholesky 3000                     best=  0.170s  median=  0.170s  (n=3)
-solve(S, b) 3000                  best=  0.370s  median=  0.400s  (n=3)
-solve(S)    3000                  best=  1.320s  median=  1.330s  (n=3)
-SVD      1500                     best=  1.460s  median=  1.470s  (n=3)
-sym eigen 1500                    best=  0.550s  median=  0.560s  (n=3)
+DGEMM   3000 x 3000               best=  0.970s  median=  0.970s  (n=3)
+crossprod 3000                    best=  0.500s  median=  0.500s  (n=3)
+Cholesky 3000                     best=  0.160s  median=  0.170s  (n=3)
+solve(S, b) 3000                  best=  0.380s  median=  0.390s  (n=3)
+solve(S)    3000                  best=  1.320s  median=  1.340s  (n=3)
+SVD      1500                     best=  1.450s  median=  1.470s  (n=3)
+sym eigen 1500                    best=  0.530s  median=  0.540s  (n=3)
 
 Done.

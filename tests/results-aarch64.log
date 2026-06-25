@@ -14,15 +14,15 @@ R_HOME:                C:/R-aarch64
 R_ARCH:                <unset>
 
 ==== Building test matrices ====
-Setup time: 10.15s
+Setup time: 10.59s
 
 ==== Benchmarks ====
-DGEMM   3000 x 3000               best=  8.400s  median=  8.500s  (n=3)
-crossprod 3000                    best=  8.850s  median=  8.920s  (n=3)
-Cholesky 3000                     best=  2.730s  median=  2.740s  (n=3)
-solve(S, b) 3000                  best=  2.560s  median=  2.580s  (n=3)
-solve(S)    3000                  best= 14.340s  median= 14.610s  (n=3)
-SVD      1500                     best=  5.160s  median=  5.190s  (n=3)
-sym eigen 1500                    best=  2.400s  median=  2.430s  (n=3)
+DGEMM   3000 x 3000               best=  8.600s  median=  8.640s  (n=3)
+crossprod 3000                    best=  8.990s  median=  9.000s  (n=3)
+Cholesky 3000                     best=  2.720s  median=  2.730s  (n=3)
+solve(S, b) 3000                  best=  2.590s  median=  2.600s  (n=3)
+solve(S)    3000                  best= 14.360s  median= 14.660s  (n=3)
+SVD      1500                     best=  5.160s  median=  5.170s  (n=3)
+sym eigen 1500                    best=  2.420s  median=  2.440s  (n=3)
 
 Done.
