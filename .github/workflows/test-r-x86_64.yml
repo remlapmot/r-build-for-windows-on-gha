@@ -45,13 +45,13 @@ jobs:
         shell: powershell
         run: |
           & "C:\R-cran\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-x86_64-cran.log
+            Tee-Object -FilePath tests/results-x86_64-cran.log -Encoding utf8
 
       - name: Benchmark OpenBLAS R
         shell: powershell
         run: |
           & "C:\R-openblas\bin\Rscript.exe" tests/blas-benchmark.R 2>&1 |
-            Tee-Object -FilePath tests/results-x86_64-openblas.log
+            Tee-Object -FilePath tests/results-x86_64-openblas.log -Encoding utf8
 
       - name: Commit results
         shell: bash
