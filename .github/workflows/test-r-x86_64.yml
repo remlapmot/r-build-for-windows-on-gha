@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  R_VERSION: '4.6.0'
+  R_VERSION: '4.6.1'
 
 permissions:
   contents: write
