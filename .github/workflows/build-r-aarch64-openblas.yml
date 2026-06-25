@@ -59,15 +59,11 @@ jobs:
           if (Test-Path $log) { Write-Host "--- rtools45-install.log ---"; Get-Content $log }
           if ($proc.ExitCode -ne 0) { exit $proc.ExitCode }
 
-      - name: Refresh Msys2 package database
-        shell: C:\rtools45-aarch64\usr\bin\bash.exe --login -eo pipefail {0}
-        run: pacman -Sy --noconfirm wget subversion
-
       - name: Download R source tarball
         shell: C:\rtools45-aarch64\usr\bin\bash.exe --login -eo pipefail {0}
         run: |
           mkdir -p /c/r-build && cd /c/r-build
-          wget "https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz"
+          curl -fLO "https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz"
           tar xzf "R-${R_VERSION}.tar.gz" || true
           mv "R-${R_VERSION}" R-src
 
@@ -76,7 +72,7 @@ jobs:
         run: |
           cd /c/r-build
           BUNDLE="tcltk-aarch64-${RTOOLS_VER}-${TCLTK_SCRIPTS}.zip"
-          wget -q "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/${BUNDLE}"
+          curl -fsSLO "https://cran.r-project.org/bin/windows/Rtools/rtools45/files/${BUNDLE}"
           cd R-src
           unzip -q "../${BUNDLE}"
 
