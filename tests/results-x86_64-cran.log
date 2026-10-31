@@ -1,5 +1,5 @@
 ==== BLAS / LAPACK configuration ====
-R version:         R version 4.6.1 (2026-06-24 ucrt) 
+R version:         R version 4.6.2 (2026-10-29 ucrt) 
 Platform:          x86_64-w64-mingw32 
 BLAS:               
 LAPACK:             
@@ -14,15 +14,15 @@ R_HOME:                C:/R-cran
 R_ARCH:                /x64
 
 ==== Building test matrices ====
-Setup time: 14.86s
+Setup time: 13.99s
 
 ==== Benchmarks ====
-DGEMM   3000 x 3000               best= 14.240s  median= 14.290s  (n=3)
-crossprod 3000                    best= 12.890s  median= 12.920s  (n=3)
-Cholesky 3000                     best=  4.140s  median=  4.150s  (n=3)
-solve(S, b) 3000                  best=  3.740s  median=  3.750s  (n=3)
-solve(S)    3000                  best= 17.110s  median= 17.640s  (n=3)
-SVD      1500                     best=  7.450s  median=  7.470s  (n=3)
-sym eigen 1500                    best=  3.470s  median=  3.480s  (n=3)
+DGEMM   3000 x 3000               best= 17.450s  median= 17.480s  (n=3)
+crossprod 3000                    best= 12.420s  median= 12.430s  (n=3)
+Cholesky 3000                     best=  3.590s  median=  3.600s  (n=3)
+solve(S, b) 3000                  best=  3.310s  median=  3.370s  (n=3)
+solve(S)    3000                  best= 18.310s  median= 18.530s  (n=3)
+SVD      1500                     best=  6.540s  median=  6.550s  (n=3)
+sym eigen 1500                    best=  3.030s  median=  3.040s  (n=3)
 
 Done.
